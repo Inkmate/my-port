@@ -177,10 +177,10 @@ const App = () => {
               <div className="flex-grow">
                 <p className="text-lg leading-relaxed mb-4">
                   Hello! I'm [WINEFRED DAVO MALONES], a WEB Developer.
-                  I specialize in building scalable web applications, designing intuitive user interfaces, optimizing database performance.
+                  I specialize in building scalable Web Applications and Android Applications, designing intuitive user interfaces, and optimizing database performance.
                 </p>
                 <p className="text-lg leading-relaxed mb-4">
-                  My journey into tech began with a fascination for how websites are built, problem-solving with code.
+                  My journey into tech began with a fascination for how websites are built and problem-solving with code.
                   Since then, I've had the opportunity to work on diverse projects, from Web applications to Cross Platform (Desktop, Android and Ios) applications,
                   each challenging me to grow and expand my skillset.
                 </p>
