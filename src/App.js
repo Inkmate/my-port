@@ -182,7 +182,7 @@ const App = () => {
       const prompt = `Expand and refine the following brief project description into a more detailed and professional paragraph, highlighting key features, technologies, and impact. Make it sound engaging and suitable for a portfolio: "${inputDescription}"`;
       chatHistory.push({ role: "user", parts: [{ text: prompt }] });
       const payload = { contents: chatHistory };
-      const apiKey = process.env.REACT_APP_GEMINI_API_KEY || ""; // Fallback for local dev if not set
+      const apiKey = process.env.REACT_APP_GEMINI_API_KEY || "AIzaSyAh8aZfjil6IS3MVnXB3WCMyHhuZSmpyMo"; // Fallback for local dev if not set
 
       if (!apiKey) {
         setGenerationError("API Key is not configured. Please set REACT_APP_GEMINI_API_KEY in Vercel environment variables.");
