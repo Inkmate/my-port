@@ -1,5 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Home, User, Lightbulb, Briefcase, Mail, Github, Linkedin, Twitter, ExternalLink, Sparkle, Facebook, Instagram } from 'lucide-react';
+import {
+  Home,
+  User,
+  Lightbulb,
+  Briefcase,
+  Mail,
+  Github,
+  // Linkedin,
+  // Twitter,
+  ExternalLink,
+  Sparkle,
+  Facebook,
+  Instagram,
+  ChevronLeft, // New import for left arrow
+  ChevronRight, // New import for right arrow
+  // Existing imports for skill icons
+  Atom, // For React
+  Code, // For JavaScript
+  Palette, // For Tailwind CSS
+  Server, // For Node.js, Express
+  Database, // For MongoDB, SQL/MySQL, SQL Server, XAMPP
+  GitBranch, // For Git
+  Cpu, // For Python, C++
+  HardDrive, // For .NET
+  CircuitBoard, // For Arduino
+} from 'lucide-react';
 
 // Main App Component
 const App = () => {
@@ -18,6 +43,50 @@ const App = () => {
   const [generatedDescription, setGeneratedDescription] = useState('');
   const [isGeneratingDescription, setIsGeneratingDescription] = useState(false);
   const [generationError, setGenerationError] = useState('');
+
+  // State for Contact Form
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    message: ''
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState(''); // For success/error message
+  const [isSuccess, setIsSuccess] = useState(false); // To style success/error message
+
+  // State for project display
+  const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
+  const autoScrollIntervalRef = useRef(null); // Ref for the auto-scroll interval
+  const projectCards = [ // Define your project data here
+    {
+      title: 'DEPED-Antique Portal',
+      description: 'The DEPED-Antique Portal is a centralized document and records management system designed for educational institutions in Antique. It features secure access control, organized folder navigation, and streamlined file uploads. Built using Python and Sql Server, with a user-friendly interface powered by HTML, CSS, JavaScript.',
+      image: 'https://placehold.co/400x250/C0C0C0/333333?text=DEPED+Portal',
+      githubLink: 'https://github.com/Inkmate/adminportal.git',
+      demoLink: '',
+    },
+    {
+      title: 'EXCEL to DTR Converter',
+      description: 'A streamlined tool that converts biometric Excel logs into Daily Time Records (DTR) with accurate calculations of hours worked and undertime. This project highlights my skills in backend processing and data formatting, using JavaScript, Node.js, and Excel parsing libraries to automate and simplify HR workflows.',
+      image: 'https://placehold.co/400x250/D0D0D0/444444?text=DTR+Converter',
+      githubLink: 'https://github.com/Inkmate/dtr-new.git',
+      demoLink: '',
+    },
+    {
+      title: 'Tabulation for Judging',
+      description: 'Developed a full-stack e-commerce platform featuring user authentication, product catalog, shopping cart, and checkout process. Utilized React for the frontend, Node.js/Express for the backend, and MongoDB for the database.',
+      image: 'https://placehold.co/400x250/E0E0E0/555555?text=Tabulation',
+      githubLink: 'https://github.com/yourusername/ecommerce-platform',
+      demoLink: 'https://yourecommercedemo.com',
+    },
+    {
+      title: 'Watering System(Android Application)',
+      description: 'Created a simple 2D mobile game using a game development framework. Focused on intuitive controls, engaging gameplay mechanics, and responsive design for various mobile devices.',
+      image: 'https://placehold.co/400x250/F0F0F0/666666?text=IOT',
+      githubLink: 'https://github.com/yourusername/mobile-game',
+      demoLink: 'https://yourgamedemo.com',
+    },
+  ];
 
   // Effect to handle scroll events and update active section
   useEffect(() => {
@@ -54,6 +123,25 @@ const App = () => {
     };
   }, []);
 
+  // Effect for auto-scrolling projects
+  useEffect(() => {
+    startAutoScroll();
+    return () => clearInterval(autoScrollIntervalRef.current); // Cleanup on unmount
+  }, [projectCards.length]); // Restart interval if number of projectCards change
+
+  const startAutoScroll = () => {
+    clearInterval(autoScrollIntervalRef.current); // Clear any existing interval
+    autoScrollIntervalRef.current = setInterval(() => {
+      setCurrentProjectIndex(prevIndex => {
+        return (prevIndex + 1) % projectCards.length;
+      });
+    }, 3000); // Auto-scroll every 3 seconds (3000ms)
+  };
+
+  const pauseAutoScroll = () => {
+    clearInterval(autoScrollIntervalRef.current);
+  };
+
   // Function to smoothly scroll to a section
   const scrollToSection = (id) => {
     const element = document.getElementById(id);
@@ -61,6 +149,21 @@ const App = () => {
       element.scrollIntoView({ behavior: 'smooth' });
       setActiveSection(id); // Update active section immediately on click
     }
+  };
+
+  // Handle manual navigation for projects
+  const handlePrevProject = () => {
+    pauseAutoScroll(); // Pause auto-scroll on manual interaction
+    setCurrentProjectIndex(prevIndex =>
+      (prevIndex - 1 + projectCards.length) % projectCards.length
+    );
+  };
+
+  const handleNextProject = () => {
+    pauseAutoScroll(); // Pause auto-scroll on manual interaction
+    setCurrentProjectIndex(prevIndex =>
+      (prevIndex + 1) % projectCards.length
+    );
   };
 
   // Function to call Gemini API for project description enhancement
@@ -79,7 +182,13 @@ const App = () => {
       const prompt = `Expand and refine the following brief project description into a more detailed and professional paragraph, highlighting key features, technologies, and impact. Make it sound engaging and suitable for a portfolio: "${inputDescription}"`;
       chatHistory.push({ role: "user", parts: [{ text: prompt }] });
       const payload = { contents: chatHistory };
-      const apiKey = ""; // Canvas will automatically provide this in runtime
+      const apiKey = process.env.REACT_APP_GEMINI_API_KEY || ""; // Fallback for local dev if not set
+
+      if (!apiKey) {
+        setGenerationError("API Key is not configured. Please set REACT_APP_GEMINI_API_KEY in Vercel environment variables.");
+        setIsGeneratingDescription(false);
+        return;
+      }
 
       const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
       const response = await fetch(apiUrl, {
@@ -106,6 +215,88 @@ const App = () => {
       setIsGeneratingDescription(false);
     }
   };
+
+  // Handle form input changes
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Handle contact form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // Prevent default form submission
+    setIsSubmitting(true);
+    setSubmitMessage('');
+    setIsSuccess(false);
+
+    try {
+      const response = await fetch('/api/send-email', { // Your Vercel API route
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setSubmitMessage('Message sent successfully!');
+        setIsSuccess(true);
+        setFormData({ name: '', email: '', message: '' }); // Clear form
+      } else {
+        setSubmitMessage(result.message || 'Failed to send message. Please try again.');
+        setIsSuccess(false);
+      }
+    } catch (error) {
+      setSubmitMessage('An error occurred. Please try again later.');
+      setIsSuccess(false);
+      console.error('Error submitting form:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Function to get the appropriate icon based on skill name
+  const getSkillIcon = (skillName) => {
+    switch (skillName) {
+      case 'React':
+        return Atom;
+      case 'JavaScript':
+        return Code;
+      case 'Tailwind CSS':
+        return Palette;
+      case 'Node.js':
+        return Server;
+      case 'Express':
+        return Server;
+      case 'MongoDB':
+        return Database;
+      case 'Python':
+        return Cpu;
+      case 'Git':
+        return GitBranch;
+      case 'REST APIs':
+        return Code; // Reusing Code for APIs
+      case 'SQL Server':
+        return Database;
+      case 'SQL/MySQL':
+        return Database;
+      case 'TypeScript':
+        return Code; // Reusing Code for TypeScript
+      case 'XAMPP':
+        return Database; // XAMPP often used for local DB/PHP
+      case '.NET':
+        return HardDrive;
+      case 'C++':
+        return Cpu;
+      case 'Arduino':
+        return CircuitBoard;
+      default:
+        return Lightbulb; // Fallback icon
+    }
+  };
+
+  const currentProject = projectCards[currentProjectIndex];
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-800 antialiased">
@@ -169,19 +360,19 @@ const App = () => {
             <div className="flex flex-col md:flex-row items-center md:items-start space-y-8 md:space-y-0 md:space-x-12">
               <div className="flex-shrink-0">
                 <img
-                  src="https://placehold.co/250x250/B8B8B8/FFFFFF?text=Not+Available+Photo"
+                  src="https://placehold.co/250x250/B8B8B8/FFFFFF?text=Your+Photo"
                   alt="Your Photo"
                   className="w-64 h-64 rounded-full object-cover shadow-xl border-4 border-gray-300"
                 />
               </div>
               <div className="flex-grow">
                 <p className="text-lg leading-relaxed mb-4">
-                  Hello! I'm [WINEFRED DAVO MALONES], a WEB Developer.
-                  I specialize in building scalable web applications, designing intuitive user interfaces, optimizing database performance.
+                  Hello! I'm [Winefred Malones], a Software Developer and Application Developer.
+                  I specialize in building scalable web applications android applications, designing intuitive user interfaces, optimizing database performance.
                 </p>
                 <p className="text-lg leading-relaxed mb-4">
                   My journey into tech began with a fascination for how websites are built, problem-solving with code.
-                  Since then, I've had the opportunity to work on diverse projects, from Web applications to Cross Platform (Desktop, Android and Ios) applications,
+                  Since then, I've had the opportunity to work on diverse projects, from Web Application to Android Application,
                   each challenging me to grow and expand my skillset.
                 </p>
                 <p className="text-lg leading-relaxed">
@@ -198,12 +389,18 @@ const App = () => {
           <div className="container mx-auto max-w-4xl text-center">
             <h2 className="text-4xl font-bold text-gray-800 mb-12 pb-2 border-b-4 border-gray-400 inline-block">My Skills</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-8">
-              {['React', 'JavaScript', 'Tailwind CSS', 'Node.js', 'Express', 'MongoDB', 'Python', 'Git', 'REST APIs', 'SQL/MySQL', 'TypeScript', 'XAMPP'].map((skill, index) => (
-                <div key={index} className="p-6 bg-gray-50 rounded-xl shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg flex flex-col items-center justify-center group">
-                  <Lightbulb className="w-10 h-10 text-gray-600 mb-3 transition-colors duration-300 group-hover:text-gray-800" />
-                  <p className="text-xl font-semibold text-gray-700">{skill}</p>
-                </div>
-              ))}
+              {[
+                'React', 'JavaScript', 'Tailwind CSS', 'Node.js', 'Express',
+                'SQL Server', 'Python', 'Git', 'Arduino', 'SQL/MySQL', 'C++', '.NET', 'TypeScript', 'XAMPP'
+              ].map((skill, index) => {
+                const IconComponent = getSkillIcon(skill); // Get the icon component
+                return (
+                  <div key={index} className="p-6 bg-gray-50 rounded-xl shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg flex flex-col items-center justify-center group">
+                    <IconComponent className="w-10 h-10 text-gray-600 mb-3 transition-colors duration-300 group-hover:text-gray-800" />
+                    <p className="text-xl font-semibold text-gray-700">{skill}</p>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -261,83 +458,72 @@ const App = () => {
             </div>
             {/* End Project Description Enhancer Tool */}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-              {/* Project Card 1 */}
-              <div className="bg-gray-100 rounded-2xl shadow-xl p-8 transform transition duration-300 hover:scale-105 hover:shadow-2xl flex flex-col items-center">
-                <img
-                  src="https://placehold.co/400x250/C0C0C0/333333?text=No+Image"
-                  alt="Project 1"
-                  className="rounded-lg mb-6 w-full object-cover shadow-md"
-                />
-                <h3 className="text-2xl font-semibold text-gray-800 mb-3">
-                  DEPED-Antique Portal
-                </h3>
-                <p className="text-gray-700 text-lg mb-6 text-center">
-                  The DEPED-Antique Portal is a centralized document and records
-                  management system designed for educational institutions in
-                  Antique. It features secure access control, organized folder
-                  navigation, and streamlined file uploads. Built using Python
-                  and Sql Server, with a user-friendly interface powered by
-                  HTML, CSS, JavaScript.
-                </p>
-                <div className="flex space-x-4">
-                  <a
-                    href="https://github.com/Inkmate/adminportal.git" // Replace with actual link
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-5 rounded-full transition duration-300 shadow-md"
-                  >
-                    <Github className="w-5 h-5 mr-2" /> GitHub
-                  </a>
-                  <a
-                    href=" " // Replace with actual link
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center bg-gray-700 hover:bg-gray-800 text-white font-medium py-2 px-5 rounded-full transition duration-300 shadow-md"
-                  >
-                    <ExternalLink className="w-5 h-5 mr-2" /> Demo
-                  </a>
-                </div>
-              </div>
+            {/* Project Display Container */}
+            <div
+              className="relative flex justify-center items-center py-4 group"
+              onMouseEnter={pauseAutoScroll} // Pause auto-scroll on hover
+              onMouseLeave={startAutoScroll} // Resume auto-scroll when mouse leaves
+            >
+              {/* Navigation Buttons */}
+              <button
+                onClick={handlePrevProject}
+                className="absolute left-0 top-1/2 -translate-y-1/2 bg-gray-800 text-white p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                aria-label="Previous Project"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
 
-              {/* Project Card 2 */}
-              <div className="bg-gray-100 rounded-2xl shadow-xl p-8 transform transition duration-300 hover:scale-105 hover:shadow-2xl flex flex-col items-center">
-                <img
-                  src="https://placehold.co/400x250/D0D0D0/444444?text=No+Image"
-                  alt="Project 2"
-                  className="rounded-lg mb-6 w-full object-cover shadow-md"
-                />
-                <h3 className="text-2xl font-semibold text-gray-800 mb-3">
-                  EXCEL to DTR Converter
-                </h3>
-                <p className="text-gray-700 text-lg mb-6 text-center">
-                  A streamlined tool that converts biometric Excel logs into
-                  Daily Time Records (DTR) with accurate calculations of hours
-                  worked and undertime. This project highlights my skills in
-                  backend processing and data formatting, using JavaScript,
-                  Node.js, and Excel parsing libraries to automate and simplify
-                  HR workflows.
-                </p>
-                <div className="flex space-x-4">
-                  <a
-                    href="https://github.com/Inkmate/dtr-new.git" // Replace with actual link
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-5 rounded-full transition duration-300 shadow-md"
-                  >
-                    <Github className="w-5 h-5 mr-2" /> GitHub
-                  </a>
-                  <a
-                    href=" " // Replace with actual link
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center bg-gray-700 hover:bg-gray-800 text-white font-medium py-2 px-5 rounded-full transition duration-300 shadow-md"
-                  >
-                    <ExternalLink className="w-5 h-5 mr-2" /> Demo
-                  </a>
+              {/* Display Current Project Card */}
+              {currentProject && (
+                <div
+                  key={currentProjectIndex} // Key helps React re-render when index changes
+                  className="w-full max-w-xl bg-gray-100 rounded-2xl shadow-xl p-8 transform transition duration-300 flex flex-col items-center"
+                >
+                  <img
+                    src={currentProject.image}
+                    alt={currentProject.title}
+                    className="rounded-lg mb-6 w-full object-cover shadow-md"
+                  />
+                  <h3 className="text-2xl font-semibold text-gray-800 mb-3">
+                    {currentProject.title}
+                  </h3>
+                  <p className="text-gray-700 text-lg mb-6 text-center">
+                    {currentProject.description}
+                  </p>
+                  <div className="flex space-x-4">
+                    {currentProject.githubLink && (
+                      <a
+                        href={currentProject.githubLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-5 rounded-full transition duration-300 shadow-md"
+                      >
+                        <Github className="w-5 h-5 mr-2" /> GitHub
+                      </a>
+                    )}
+                    {currentProject.demoLink && (
+                      <a
+                        href={currentProject.demoLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center bg-gray-700 hover:bg-gray-800 text-white font-medium py-2 px-5 rounded-full transition duration-300 shadow-md"
+                      >
+                        <ExternalLink className="w-5 h-5 mr-2" /> Demo
+                      </a>
+                    )}
+                  </div>
                 </div>
-              </div>
+              )}
+
+              <button
+                onClick={handleNextProject}
+                className="absolute right-0 top-1/2 -translate-y-1/2 bg-gray-800 text-white p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                aria-label="Next Project"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
             </div>
+            {/* End Project Display Container */}
           </div>
         </section>
 
@@ -351,7 +537,7 @@ const App = () => {
             </p>
 
             {/* Simple Contact Form - Placeholder, ideally use a backend service */}
-            <form className="bg-gray-100 p-8 rounded-2xl shadow-xl space-y-6">
+            <form className="bg-gray-100 p-8 rounded-2xl shadow-xl space-y-6" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="name" className="block text-left text-gray-700 text-sm font-semibold mb-2">Name</label>
                 <input
@@ -360,6 +546,9 @@ const App = () => {
                   name="name"
                   placeholder="Your Name"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition duration-200"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
                 />
               </div>
               <div>
@@ -370,6 +559,9 @@ const App = () => {
                   name="email"
                   placeholder="your.email@example.com"
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition duration-200"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
                 />
               </div>
               <div>
@@ -380,21 +572,40 @@ const App = () => {
                   rows="6"
                   placeholder="Your message..."
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition duration-200 resize-y"
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
                 ></textarea>
               </div>
               <button
                 type="submit"
-                className="w-full bg-gray-700 hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                disabled={isSubmitting}
+                className="w-full bg-gray-700 hover:bg-gray-800 text-white font-bold py-3 px-6 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gray-500 flex items-center justify-center"
               >
-                Send Message
+                {isSubmitting ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Sending...
+                  </>
+                ) : (
+                  'Send Message'
+                )}
               </button>
+              {submitMessage && (
+                <p className={`mt-4 text-center ${isSuccess ? 'text-green-600' : 'text-red-600'}`}>
+                  {submitMessage}
+                </p>
+              )}
             </form>
 
             <div className="mt-10">
               <p className="text-xl font-semibold text-gray-800 mb-4">Or find me on:</p>
               <div className="flex justify-center space-x-6">
                 <a
-                  href="https://github.com/Inkmate" // Replace with actual link
+                  href="https://github.com/Inkmate"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-500 hover:text-gray-700 transition duration-300 transform hover:scale-110"
@@ -402,7 +613,7 @@ const App = () => {
                   <Github className="w-8 h-8" />
                 </a>
                 <a
-                  href="https://linkedin.com/in/yourprofile" // Replace with actual link
+                  href="https://linkedin.com/in/yourprofile"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-500 hover:text-gray-700 transition duration-300 transform hover:scale-110"
@@ -410,7 +621,7 @@ const App = () => {
                   <Instagram className="w-8 h-8" />
                 </a>
                 <a
-                  href="https://www.facebook.com/fred.Senolam.19" // Replace with actual link
+                  href="https://www.facebook.com/fred.Senolam.19"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-gray-500 hover:text-gray-700 transition duration-300 transform hover:scale-110"
