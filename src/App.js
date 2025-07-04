@@ -638,7 +638,7 @@ const App = () => {
       <footer className="bg-gray-800 text-white py-8 px-4 text-center">
         <div className="container mx-auto">
           <p className="text-lg mb-4">
-            Designed and Developed by [Winefred D Malones]
+            Designed and Developed by [Winefred D. Malones]
           </p>
           <p className="text-sm">
             &copy; {new Date().getFullYear()} All rights reserved.
