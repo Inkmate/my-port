@@ -19,15 +19,15 @@ export default async function handler(req, res) {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.GMAIL_USER, // Your Gmail address (e.g., yourdeveloper@gmail.com)
-      pass: process.env.GMAIL_APP_PASSWORD, // Your generated App password
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD,
     },
   });
 
   // Email content
   const mailOptions = {
-    from: process.env.GMAIL_USER, // Sender email
-    to: process.env.GMAIL_USER, // Recipient email (your developer Gmail)
+    from: process.env.GMAIL_USER,
+    to: process.env.GMAIL_USER,
     subject: `New Contact Form Submission from ${name}`,
     html: `
       <p><strong>Name:</strong> ${name}</p>

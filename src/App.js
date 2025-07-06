@@ -12,19 +12,24 @@ import {
   Sparkle,
   Facebook,
   Instagram,
-  ChevronLeft, // New import for left arrow
-  ChevronRight, // New import for right arrow
-  // Existing imports for skill icons
-  Atom, // For React
-  Code, // For JavaScript
-  Palette, // For Tailwind CSS
-  Server, // For Node.js, Express
-  Database, // For MongoDB, SQL/MySQL, SQL Server, XAMPP
-  GitBranch, // For Git
-  Cpu, // For Python, C++
-  HardDrive, // For .NET
-  CircuitBoard, // For Arduino
+  ChevronLeft,
+  ChevronRight,
+  Atom,
+  Code,
+  Palette,
+  Server,
+  Database,
+  GitBranch,
+  Cpu,
+  HardDrive, 
+  CircuitBoard,
 } from 'lucide-react';
+
+
+import depedPortalImage from './assets/images/1.png';
+import dtrConverterImage from './assets/images/3.png';
+import tabulationImage from './assets/images/2.png';
+import iotSystemImage from './assets/images/4.jpg';
 
 // Main App Component
 const App = () => {
@@ -51,38 +56,38 @@ const App = () => {
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitMessage, setSubmitMessage] = useState(''); // For success/error message
-  const [isSuccess, setIsSuccess] = useState(false); // To style success/error message
+  const [submitMessage, setSubmitMessage] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
 
   // State for project display
   const [currentProjectIndex, setCurrentProjectIndex] = useState(0);
-  const autoScrollIntervalRef = useRef(null); // Ref for the auto-scroll interval
-  const projectCards = [ // Define your project data here
+  const autoScrollIntervalRef = useRef(null); 
+  const projectCards = [
     {
       title: 'DEPED-Antique Portal',
       description: 'The DEPED-Antique Portal is a centralized document and records management system designed for educational institutions in Antique. It features secure access control, organized folder navigation, and streamlined file uploads. Built using Python and Sql Server, with a user-friendly interface powered by HTML, CSS, JavaScript.',
-      image: 'https://placehold.co/400x250/C0C0C0/333333?text=DEPED+Portal',
+      image: depedPortalImage,
       githubLink: 'https://github.com/Inkmate/adminportal.git',
       demoLink: '',
     },
     {
       title: 'EXCEL to DTR Converter',
       description: 'A streamlined tool that converts biometric Excel logs into Daily Time Records (DTR) with accurate calculations of hours worked and undertime. This project highlights my skills in backend processing and data formatting, using JavaScript, Node.js, and Excel parsing libraries to automate and simplify HR workflows.',
-      image: 'https://placehold.co/400x250/D0D0D0/444444?text=DTR+Converter',
+      image: dtrConverterImage,
       githubLink: 'https://github.com/Inkmate/dtr-new.git',
       demoLink: '',
     },
     {
       title: 'Tabulation for Judging',
       description: 'Developed a full-stack e-commerce platform featuring user authentication, product catalog, shopping cart, and checkout process. Utilized React for the frontend, Node.js/Express for the backend, and MongoDB for the database.',
-      image: 'https://placehold.co/400x250/E0E0E0/555555?text=Tabulation',
+      image: tabulationImage,
       githubLink: 'https://github.com/yourusername/ecommerce-platform',
       demoLink: 'https://yourecommercedemo.com',
     },
     {
       title: 'Watering System(Android Application)',
       description: 'Created a simple 2D mobile game using a game development framework. Focused on intuitive controls, engaging gameplay mechanics, and responsive design for various mobile devices.',
-      image: 'https://placehold.co/400x250/F0F0F0/666666?text=IOT',
+      image: iotSystemImage,
       githubLink: 'https://github.com/yourusername/mobile-game',
       demoLink: 'https://yourgamedemo.com',
     },
@@ -93,7 +98,7 @@ const App = () => {
     const observerOptions = {
       root: null,
       rootMargin: '0px',
-      threshold: 0.7, // Adjust threshold to determine when a section is considered "active"
+      threshold: 0.7,
     };
 
     const observerCallback = (entries) => {
@@ -126,16 +131,16 @@ const App = () => {
   // Effect for auto-scrolling projects
   useEffect(() => {
     startAutoScroll();
-    return () => clearInterval(autoScrollIntervalRef.current); // Cleanup on unmount
-  }, [projectCards.length]); // Restart interval if number of projectCards change
+    return () => clearInterval(autoScrollIntervalRef.current);
+  }, [projectCards.length]);
 
   const startAutoScroll = () => {
-    clearInterval(autoScrollIntervalRef.current); // Clear any existing interval
+    clearInterval(autoScrollIntervalRef.current);
     autoScrollIntervalRef.current = setInterval(() => {
       setCurrentProjectIndex(prevIndex => {
         return (prevIndex + 1) % projectCards.length;
       });
-    }, 3000); // Auto-scroll every 3 seconds (3000ms)
+    }, 3000); 
   };
 
   const pauseAutoScroll = () => {
@@ -147,20 +152,20 @@ const App = () => {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
-      setActiveSection(id); // Update active section immediately on click
+      setActiveSection(id);
     }
   };
 
   // Handle manual navigation for projects
   const handlePrevProject = () => {
-    pauseAutoScroll(); // Pause auto-scroll on manual interaction
+    pauseAutoScroll();
     setCurrentProjectIndex(prevIndex =>
       (prevIndex - 1 + projectCards.length) % projectCards.length
     );
   };
 
   const handleNextProject = () => {
-    pauseAutoScroll(); // Pause auto-scroll on manual interaction
+    pauseAutoScroll();
     setCurrentProjectIndex(prevIndex =>
       (prevIndex + 1) % projectCards.length
     );
@@ -182,7 +187,7 @@ const App = () => {
       const prompt = `Expand and refine the following brief project description into a more detailed and professional paragraph, highlighting key features, technologies, and impact. Make it sound engaging and suitable for a portfolio: "${inputDescription}"`;
       chatHistory.push({ role: "user", parts: [{ text: prompt }] });
       const payload = { contents: chatHistory };
-      const apiKey = process.env.REACT_APP_GEMINI_API_KEY || ""; // Fallback for local dev if not set
+      const apiKey = process.env.REACT_APP_GEMINI_API_KEY || "AIzaSyAh8aZfjil6IS3MVnXB3WCMyHhuZSmpyMo"; // Fallback for local dev if not set
 
       if (!apiKey) {
         setGenerationError("API Key is not configured. Please set REACT_APP_GEMINI_API_KEY in Vercel environment variables.");
@@ -223,13 +228,13 @@ const App = () => {
 
   // Handle contact form submission
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent default form submission
+    e.preventDefault();
     setIsSubmitting(true);
     setSubmitMessage('');
     setIsSuccess(false);
 
     try {
-      const response = await fetch('/api/send-email', { // Your Vercel API route
+      const response = await fetch('/api/send-email', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -242,7 +247,7 @@ const App = () => {
       if (response.ok) {
         setSubmitMessage('Message sent successfully!');
         setIsSuccess(true);
-        setFormData({ name: '', email: '', message: '' }); // Clear form
+        setFormData({ name: '', email: '', message: '' });
       } else {
         setSubmitMessage(result.message || 'Failed to send message. Please try again.');
         setIsSuccess(false);
@@ -276,15 +281,15 @@ const App = () => {
       case 'Git':
         return GitBranch;
       case 'REST APIs':
-        return Code; // Reusing Code for APIs
+        return Code;
       case 'SQL Server':
         return Database;
       case 'SQL/MySQL':
         return Database;
-      case 'TypeScript':
-        return Code; // Reusing Code for TypeScript
+      case 'Internet of Things':
+        return Code;
       case 'XAMPP':
-        return Database; // XAMPP often used for local DB/PHP
+        return Database;
       case '.NET':
         return HardDrive;
       case 'C++':
@@ -292,7 +297,7 @@ const App = () => {
       case 'Arduino':
         return CircuitBoard;
       default:
-        return Lightbulb; // Fallback icon
+        return Lightbulb;
     }
   };
 
@@ -360,8 +365,8 @@ const App = () => {
             <div className="flex flex-col md:flex-row items-center md:items-start space-y-8 md:space-y-0 md:space-x-12">
               <div className="flex-shrink-0">
                 <img
-                  src="https://placehold.co/250x250/B8B8B8/FFFFFF?text=Your+Photo"
-                  alt="Your Photo"
+                  src="https://scontent.fceb1-3.fna.fbcdn.net/v/t39.30808-6/473078761_1690961551836914_6418561073548240781_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=a5f93a&_nc_eui2=AeH1zzhlA4ltwyjPBy_qvxrP7HCliszks2XscKWKzOSzZZozgVWZzwsez0UkakB6Yhf7PwnTk5RSTA9YE96Ek0X4&_nc_ohc=zRYE73CRyU0Q7kNvwH33VNR&_nc_oc=AdlhtKVvwMPVxzsSGlLkcqWAXUEOw34Zp-FASsxTNuoeSk2zEFkUW3dkr7ar0_IxykM&_nc_zt=23&_nc_ht=scontent.fceb1-3.fna&_nc_gid=VdrzQqtjGdAN8GO3lYw62A&oh=00_AfQ8BGIKQEY3Zp23TlVbWKnnKhAWKUHa5DMdXeKzufhLNw&oe=686FCDEA"
+                  alt="No Photo"
                   className="w-64 h-64 rounded-full object-cover shadow-xl border-4 border-gray-300"
                 />
               </div>
@@ -391,9 +396,9 @@ const App = () => {
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-8">
               {[
                 'React', 'JavaScript', 'Tailwind CSS', 'Node.js', 'Express',
-                'SQL Server', 'Python', 'Git', 'Arduino', 'SQL/MySQL', 'C++', '.NET', 'TypeScript', 'XAMPP'
+                'SQL Server', 'Python', 'Git', 'Arduino', 'SQL/MySQL', 'C++', '.NET', 'IoT', 'XAMPP'
               ].map((skill, index) => {
-                const IconComponent = getSkillIcon(skill); // Get the icon component
+                const IconComponent = getSkillIcon(skill);
                 return (
                   <div key={index} className="p-6 bg-gray-50 rounded-xl shadow-md transition duration-300 ease-in-out transform hover:scale-105 hover:shadow-lg flex flex-col items-center justify-center group">
                     <IconComponent className="w-10 h-10 text-gray-600 mb-3 transition-colors duration-300 group-hover:text-gray-800" />
@@ -461,8 +466,8 @@ const App = () => {
             {/* Project Display Container */}
             <div
               className="relative flex justify-center items-center py-4 group"
-              onMouseEnter={pauseAutoScroll} // Pause auto-scroll on hover
-              onMouseLeave={startAutoScroll} // Resume auto-scroll when mouse leaves
+              onMouseEnter={pauseAutoScroll} 
+              onMouseLeave={startAutoScroll}
             >
               {/* Navigation Buttons */}
               <button
@@ -476,7 +481,7 @@ const App = () => {
               {/* Display Current Project Card */}
               {currentProject && (
                 <div
-                  key={currentProjectIndex} // Key helps React re-render when index changes
+                  key={currentProjectIndex}
                   className="w-full max-w-xl bg-gray-100 rounded-2xl shadow-xl p-8 transform transition duration-300 flex flex-col items-center"
                 >
                   <img
